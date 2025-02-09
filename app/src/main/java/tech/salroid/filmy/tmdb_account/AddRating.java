@@ -3,11 +3,11 @@ package tech.salroid.filmy.tmdb_account;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 
+import androidx.core.app.NotificationCompat;
+
 import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -45,7 +45,7 @@ import tech.salroid.filmy.network_stuff.TmdbVolleySingleton;
  */
 public class AddRating {
 
-    private String api_key = BuildConfig.API_KEY;
+    private String api_key = BuildConfig.TMDB_API_KEY;
     private String SESSION_PREF = "SESSION_PREFERENCE";
     private TmdbVolleySingleton tmdbVolleySingleton = TmdbVolleySingleton.getInstance();
     private RequestQueue tmdbrequestQueue = tmdbVolleySingleton.getRequestQueue();
@@ -84,7 +84,7 @@ public class AddRating {
 
         String PROFILE_URI = "https://api.themoviedb.org/3/account?api_key=" + api_key + "&session_id=" + session_id;
 
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, PROFILE_URI, null,
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(PROFILE_URI, null,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
@@ -140,7 +140,7 @@ public class AddRating {
         final String mRequestBody = jsonBody.toString();
 
 
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, query, null,
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(query, null,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {

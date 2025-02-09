@@ -2,7 +2,6 @@ package tech.salroid.filmy.network_stuff;
 
 import android.util.Log;
 
-import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -44,7 +43,7 @@ public class GetDataFromNetwork {
 
         //still here we will use the query builder
         //this String is not awesome.
-        String api_key = BuildConfig.API_KEY;
+        String api_key = BuildConfig.TMDB_API_KEY;
 
         final String BASE_URL_MOVIE_DETAILS = new String(FilmyApplication.getContext().getResources().getString(R.string.tmdb_movie_base_url)
                 + movie_id
@@ -53,7 +52,7 @@ public class GetDataFromNetwork {
                 + "&append_to_response=trailers");
 
 
-        JsonObjectRequest jsonObjectRequestForMovieDetails = new JsonObjectRequest(Request.Method.GET, BASE_URL_MOVIE_DETAILS, null,
+        JsonObjectRequest jsonObjectRequestForMovieDetails = new JsonObjectRequest(BASE_URL_MOVIE_DETAILS, null,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {

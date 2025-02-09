@@ -3,17 +3,19 @@ package tech.salroid.filmy.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.android.volley.Request;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -59,9 +61,10 @@ public class SimilarFragment extends Fragment implements SimilarMovieActivityAda
     BreathingProgress breathingProgress;
     @BindView(R.id.card_holder)
     TextView card_holder;
+    @BindView(R.id.detail_fragment_views_layout)
+    RelativeLayout relativeLayout;
     private String similar_json;
     private String movieId, movieTitle;
-    private String api_key = BuildConfig.API_KEY;
 
     public static SimilarFragment newInstance(String movie_Id, String movie_Title) {
         SimilarFragment fragment = new SimilarFragment();
@@ -74,7 +77,7 @@ public class SimilarFragment extends Fragment implements SimilarMovieActivityAda
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.similar_fragment, container, false);
         ButterKnife.bind(this, view);
@@ -96,12 +99,9 @@ public class SimilarFragment extends Fragment implements SimilarMovieActivityAda
         Bundle savedBundle = getArguments();
 
         if (savedBundle != null) {
-
             movieId = savedBundle.getString("movie_id");
             movieTitle = savedBundle.getString("movie_title");
-
         }
-
 
         if (movieId != null)
             getSimilarFromNetwork(movieId);
@@ -111,8 +111,9 @@ public class SimilarFragment extends Fragment implements SimilarMovieActivityAda
 
     public void getSimilarFromNetwork(String movieId) {
 
-        final String BASE_MOVIE_CAST_DETAILS = new String(" https://api.themoviedb.org/3/movie/" + movieId + "/similar?api_key="+api_key);
-        JsonObjectRequest jsonObjectRequestForMovieCastDetails = new JsonObjectRequest(Request.Method.GET, BASE_MOVIE_CAST_DETAILS, null,
+        String api_key = BuildConfig.TMDB_API_KEY;
+        final String BASE_MOVIE_CAST_DETAILS = new String(" https://api.themoviedb.org/3/movie/" + movieId + "/recommendations?api_key="+ api_key);
+        JsonObjectRequest jsonObjectRequestForMovieCastDetails = new JsonObjectRequest(BASE_MOVIE_CAST_DETAILS, null,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
@@ -157,7 +158,7 @@ public class SimilarFragment extends Fragment implements SimilarMovieActivityAda
         breathingProgress.setVisibility(View.GONE);
         similar_recycler.setVisibility(View.VISIBLE);
 
-
+        relativeLayout.setMinimumHeight(0);
     }
 
     @Override

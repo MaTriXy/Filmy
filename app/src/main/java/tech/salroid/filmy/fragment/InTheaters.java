@@ -1,21 +1,22 @@
 package tech.salroid.filmy.fragment;
 
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.loader.app.LoaderManager;
+import androidx.loader.content.CursorLoader;
+import androidx.loader.content.Loader;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -46,22 +47,23 @@ import tech.salroid.filmy.database.MovieProjection;
 
 public class InTheaters extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, MainActivityAdapter.ClickListener {
 
-
     private MainActivityAdapter mainActivityAdapter;
-    public boolean isShowingFromDatabase;
-
+    private boolean isShowingFromDatabase;
 
     @BindView(R.id.breathingProgress)
     BreathingProgress breathingProgress;
     @BindView((R.id.recycler))
     RecyclerView recycler;
 
+    private StaggeredGridLayoutManager gridLayoutManager;
+    private boolean isInMultiWindowMode;
+
     public InTheaters() {
         // Required empty public constructor
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_in_theaters, container, false);
@@ -70,32 +72,56 @@ public class InTheaters extends Fragment implements LoaderManager.LoaderCallback
 
         boolean tabletSize = getResources().getBoolean(R.bool.isTablet);
 
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            isInMultiWindowMode = getActivity().isInMultiWindowMode();
+        }
+
         if (tabletSize) {
 
             if (getActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
 
-                StaggeredGridLayoutManager gridLayoutManager = new StaggeredGridLayoutManager(6,
+                gridLayoutManager = new StaggeredGridLayoutManager(6,
                         StaggeredGridLayoutManager.VERTICAL);
                 recycler.setLayoutManager(gridLayoutManager);
+
             } else {
-                StaggeredGridLayoutManager gridLayoutManager = new StaggeredGridLayoutManager(8,
-                        StaggeredGridLayoutManager.VERTICAL);
-                recycler.setLayoutManager(gridLayoutManager);
+
+                if (isInMultiWindowMode) {
+
+                    gridLayoutManager = new StaggeredGridLayoutManager(6,
+                            StaggeredGridLayoutManager.VERTICAL);
+                    recycler.setLayoutManager(gridLayoutManager);
+
+                } else {
+
+                    gridLayoutManager = new StaggeredGridLayoutManager(8,
+                            StaggeredGridLayoutManager.VERTICAL);
+                    recycler.setLayoutManager(gridLayoutManager);
+
+                }
             }
 
         } else {
 
             if (getActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
 
-                StaggeredGridLayoutManager gridLayoutManager = new StaggeredGridLayoutManager(3,
-                        StaggeredGridLayoutManager.VERTICAL);
+                gridLayoutManager = new StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL);
                 recycler.setLayoutManager(gridLayoutManager);
-            } else {
-                StaggeredGridLayoutManager gridLayoutManager = new StaggeredGridLayoutManager(5,
-                        StaggeredGridLayoutManager.VERTICAL);
-                recycler.setLayoutManager(gridLayoutManager);
-            }
 
+            } else {
+
+                if (isInMultiWindowMode) {
+
+                    gridLayoutManager = new StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL);
+                    recycler.setLayoutManager(gridLayoutManager);
+
+                } else {
+
+                    gridLayoutManager = new StaggeredGridLayoutManager(5, StaggeredGridLayoutManager.VERTICAL);
+                    recycler.setLayoutManager(gridLayoutManager);
+
+                }
+            }
         }
 
         mainActivityAdapter = new MainActivityAdapter(getActivity(), null);
@@ -129,7 +155,7 @@ public class InTheaters extends Fragment implements LoaderManager.LoaderCallback
     }
 
     @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+    public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor cursor) {
         if (cursor != null && cursor.getCount() > 0) {
 
             isShowingFromDatabase = true;
@@ -145,7 +171,7 @@ public class InTheaters extends Fragment implements LoaderManager.LoaderCallback
     }
 
     @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
+    public void onLoaderReset(@NonNull Loader<Cursor> loader) {
         mainActivityAdapter.swapCursor(null);
     }
 
@@ -155,7 +181,6 @@ public class InTheaters extends Fragment implements LoaderManager.LoaderCallback
 
         int id_index = cursor.getColumnIndex(FilmContract.MoviesEntry.MOVIE_ID);
         int title_index = cursor.getColumnIndex(FilmContract.MoviesEntry.MOVIE_TITLE);
-
 
         Intent intent = new Intent(getActivity(), MovieDetailsActivity.class);
         intent.putExtra("title", cursor.getString(title_index));
@@ -167,6 +192,23 @@ public class InTheaters extends Fragment implements LoaderManager.LoaderCallback
         intent.putExtra("id", cursor.getString(id_index));
         startActivity(intent);
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT)
-            getActivity().overridePendingTransition(0,0);
+            getActivity().overridePendingTransition(0, 0);
+    }
+
+    @Override
+    public void onMultiWindowModeChanged(boolean isInMultiWindowMode) {
+        super.onMultiWindowModeChanged(isInMultiWindowMode);
+
+        if (getActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+
+            if (isInMultiWindowMode)
+                gridLayoutManager = new StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL);
+            else
+                gridLayoutManager = new StaggeredGridLayoutManager(5, StaggeredGridLayoutManager.VERTICAL);
+
+            recycler.setLayoutManager(gridLayoutManager);
+            recycler.setAdapter(mainActivityAdapter);
+        }
+
     }
 }

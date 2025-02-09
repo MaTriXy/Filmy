@@ -6,18 +6,10 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.speech.RecognizerIntent;
-import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.TabLayout;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -25,6 +17,14 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.viewpager.widget.ViewPager;
+
+import com.google.android.material.appbar.AppBarLayout;
+import com.google.android.material.tabs.TabLayout;
 import com.miguelcatalan.materialsearchview.MaterialSearchView;
 
 import java.util.ArrayList;
@@ -36,7 +36,6 @@ import tech.salroid.filmy.R;
 import tech.salroid.filmy.custom_adapter.MyPagerAdapter;
 import tech.salroid.filmy.customs.CustomToast;
 import tech.salroid.filmy.fragment.InTheaters;
-import tech.salroid.filmy.fragment.SavedMovies;
 import tech.salroid.filmy.fragment.SearchFragment;
 import tech.salroid.filmy.fragment.Trending;
 import tech.salroid.filmy.fragment.UpComing;
@@ -63,7 +62,6 @@ import tr.xip.errorview.ErrorView;
 
 public class MainActivity extends AppCompatActivity {
 
-
     public boolean fetchingFromNetwork;
 
     @BindView(R.id.toolbar)
@@ -78,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
     ViewPager viewPager;
     @BindView(R.id.tab_layout)
     TabLayout tabLayout;
-    @BindView(R.id.error_view)
+    @BindView(R.id.main_error_view)
     ErrorView mErrorView;
 
     private Trending trendingFragment;
@@ -91,17 +89,12 @@ public class MainActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             // Extract data included in the Intent
             int statusCode = intent.getIntExtra("message", 0);
-
-
             CustomToast.show(context, "Failed to get latest movies.", true);
-
             cantProceed(statusCode);
-
         }
     };
 
     @Override
-
     protected void onCreate(Bundle savedInstanceState) {
 
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
@@ -112,7 +105,6 @@ public class MainActivity extends AppCompatActivity {
             setTheme(R.style.AppTheme_Base);
 
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
@@ -123,35 +115,22 @@ public class MainActivity extends AppCompatActivity {
 
         introLogic();
 
-        Typeface typeface = Typeface.createFromAsset(getAssets(), "fonts/canaro_extra_bold.otf");
-        logo.setTypeface(typeface);
-
         if (nightMode)
             allThemeLogic();
 
-        mErrorView.setConfig(ErrorView.Config.create()
-                .title(getString(R.string.error_title_damn))
-                .titleColor(ContextCompat.getColor(this, R.color.dark))
-                .subtitle(getString(R.string.error_details))
-                .retryText(getString(R.string.error_retry))
-                .build());
+        mErrorView
+                .setTitle(getString(R.string.error_title_damn))
+                .setTitleColor(ContextCompat.getColor(this, R.color.dark))
+                .setSubtitle(getString(R.string.error_details))
+                .setRetryText(getString(R.string.error_retry));
 
 
-        mErrorView.setOnRetryListener(new ErrorView.RetryListener() {
-            @Override
-            public void onRetry() {
-
-                if (Network.isNetworkConnected(MainActivity.this)) {
-
-                    fetchingFromNetwork = true;
-
-                    setScheduler();
-
-                }
-
-                canProceed();
-
+        mErrorView.setRetryListener(() -> {
+            if (Network.isNetworkConnected(MainActivity.this)) {
+                fetchingFromNetwork = true;
+                setScheduler();
             }
+            canProceed();
         });
 
 
@@ -218,7 +197,6 @@ public class MainActivity extends AppCompatActivity {
 
 
         if (Network.isNetworkConnected(this)) {
-
             fetchingFromNetwork = true;
             setScheduler();
         }
@@ -226,13 +204,16 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+
     private void allThemeLogic() {
 
         tabLayout.setTabTextColors(Color.parseColor("#bdbdbd"), Color.parseColor("#e0e0e0"));
+        tabLayout.setBackgroundColor(ContextCompat.getColor(this,R.color.colorDarkThemePrimary));
+        tabLayout.setSelectedTabIndicatorColor(Color.parseColor("#bdbdbd"));
         logo.setTextColor(Color.parseColor("#E0E0E0"));
         materialSearchView.setBackgroundColor(getResources().getColor(R.color.colorDarkThemePrimary));
-        materialSearchView.setBackIcon(getResources().getDrawable(R.drawable.ic_action_navigation_arrow_back_inverted));
-        materialSearchView.setCloseIcon(getResources().getDrawable(R.drawable.ic_action_navigation_close_inverted));
+        materialSearchView.setBackIcon(ContextCompat.getDrawable(this,R.drawable.ic_action_navigation_arrow_back_inverted));
+        materialSearchView.setCloseIcon(ContextCompat.getDrawable(this,R.drawable.ic_action_navigation_close_inverted));
         materialSearchView.setTextColor(Color.parseColor("#ffffff"));
 
     }
@@ -265,7 +246,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void setScheduler() {
 
-
         FirstFetch firstFetch = new FirstFetch(this);
         firstFetch.start();
 
@@ -273,22 +253,16 @@ public class MainActivity extends AppCompatActivity {
 
     public void cantProceed(final int status) {
 
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
+        new Handler().postDelayed(() -> {
 
-                if (trendingFragment != null && !trendingFragment.isShowingFromDatabase) {
-
-                    cantProceed = true;
-
-                    tabLayout.setVisibility(View.GONE);
-                    viewPager.setVisibility(View.GONE);
-                    mErrorView.setError(status);
-                    mErrorView.setVisibility(View.VISIBLE);
-
-                    //disable toolbar scrolling
-                    disableToolbarScrolling();
-                }
+            if (trendingFragment != null && !trendingFragment.isShowingFromDatabase) {
+                cantProceed = true;
+                tabLayout.setVisibility(View.GONE);
+                viewPager.setVisibility(View.GONE);
+                //mErrorView.setError(status);
+                mErrorView.setVisibility(View.VISIBLE);
+                //disable toolbar scrolling
+                disableToolbarScrolling();
             }
         }, 1000);
 
@@ -356,11 +330,11 @@ public class MainActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.main_menu, menu);
 
         MenuItem itemSearch = menu.findItem(R.id.action_search);
-        MenuItem itemAccount = menu.findItem(R.id.ic_account);
+        MenuItem itemAccount = menu.findItem(R.id.ic_collections);
 
         if (nightMode) {
             itemSearch.setIcon(R.drawable.ic_action_action_search);
-            itemAccount.setIcon(R.drawable.ic_action_action_account_circle2);
+            itemAccount.setIcon(R.drawable.ic_action_collections_bookmark2);
         }
 
         materialSearchView.setMenuItem(itemSearch);
@@ -381,10 +355,7 @@ public class MainActivity extends AppCompatActivity {
             case R.id.ic_setting:
                 startActivity(new Intent(this, SettingsActivity.class));
                 break;
-            case R.id.ic_collection:
-                startActivity(new Intent(this, SavedMovies.class));
-                break;
-            case R.id.ic_account:
+            case R.id.ic_collections:
                 startActivity(new Intent(this, CollectionsActivity.class));
                 break;
         }

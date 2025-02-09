@@ -5,12 +5,15 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <android.support.v7.widget.CardView
+    <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:strokeWidth="0dp"
+        app:strokeColor="@color/grey"
         app:cardCornerRadius="0dp">
 
         <RelativeLayout
+            android:id="@+id/detail_fragment_views_layout"
             android:layout_width="match_parent"
             android:minHeight="200dp"
             android:layout_height="wrap_content">
@@ -19,7 +22,7 @@
                 android:id="@+id/card_holder"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="sans-serif-condensed"
+                android:fontFamily="@font/circularstd_book"
                 android:padding="16dp"
                 android:text="@string/cast"
                 android:textAppearance="?android:textAppearanceMedium"
@@ -31,7 +34,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:background="?android:selectableItemBackground"
-                android:fontFamily="sans-serif-condensed"
+                android:fontFamily="@font/circularstd_book"
                 android:padding="16dp"
                 android:text="@string/more"
                 android:textAppearance="?android:textAppearanceMedium"
@@ -39,8 +42,7 @@
                 android:textStyle="bold"
                 android:visibility="invisible" />
 
-            <android.support.v7.widget.RecyclerView
-
+            <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/cast_recycler"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -58,6 +60,6 @@
                 />
 
         </RelativeLayout>
-    </android.support.v7.widget.CardView>
+    </com.google.android.material.card.MaterialCardView>
 
 </FrameLayout>

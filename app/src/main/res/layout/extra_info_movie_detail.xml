@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="16dp"
+    android:layout_marginTop="16dp"
     >
 
     <RelativeLayout
@@ -18,8 +19,10 @@
             android:id="@+id/runtime_holder"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:fontFamily="sans-serif-condensed"
+            android:fontFamily="@font/circularstd_book"
             android:text="@string/runtime"
+            android:drawableStart="@drawable/twotone_access_time_24"
+            android:drawablePadding="@dimen/widget_margin"
             android:textSize="16sp" />
 
         <TextView
@@ -30,7 +33,7 @@
             android:layout_marginLeft="8dp"
             android:layout_toEndOf="@id/runtime_holder"
             android:layout_toRightOf="@id/runtime_holder"
-            android:fontFamily="sans-serif-condensed"
+            android:fontFamily="@font/circularstd_book"
             android:text=""
             android:textSize="14sp" />
 
@@ -39,8 +42,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/runtime_holder"
-            android:fontFamily="sans-serif-condensed"
+            android:fontFamily="@font/circularstd_book"
             android:text="@string/genre"
+            android:layout_marginTop="@dimen/widget_margin_half"
+            android:drawablePadding="@dimen/widget_margin"
+            android:drawableStart="@drawable/twotone_movie_24"
             android:textSize="16sp" />
 
         <TextView
@@ -52,7 +58,7 @@
             android:layout_marginLeft="8dp"
             android:layout_toEndOf="@id/certification_holder"
             android:layout_toRightOf="@id/certification_holder"
-            android:fontFamily="sans-serif-condensed"
+            android:fontFamily="@font/circularstd_book"
             android:text=""
             android:maxLines="1"
             android:ellipsize="end"
@@ -64,8 +70,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/detail_certification"
-            android:fontFamily="sans-serif-condensed"
+            android:fontFamily="@font/circularstd_book"
             android:text="@string/language"
+            android:layout_marginTop="@dimen/widget_margin_half"
+            android:drawableStart="@drawable/twotone_language_24"
+            android:drawablePadding="@dimen/widget_margin"
             android:textSize="16sp" />
 
         <TextView
@@ -78,7 +87,7 @@
             android:layout_marginLeft="8dp"
             android:layout_toEndOf="@id/language_holder"
             android:layout_toRightOf="@id/language_holder"
-            android:fontFamily="sans-serif-condensed"
+            android:fontFamily="@font/circularstd_book"
             android:text=""
             android:textSize="14sp" />
 
@@ -87,8 +96,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/language_holder"
-            android:fontFamily="sans-serif-condensed"
+            android:fontFamily="@font/circularstd_book"
             android:text="@string/release_date"
+            android:layout_marginTop="@dimen/widget_margin_half"
+            android:drawablePadding="@dimen/widget_margin"
+            android:drawableStart="@drawable/twotone_calendar_today_24"
             android:textSize="16sp" />
 
 
@@ -101,7 +113,7 @@
             android:layout_marginLeft="8dp"
             android:layout_toEndOf="@id/release_holder"
             android:layout_toRightOf="@id/release_holder"
-            android:fontFamily="sans-serif-condensed"
+            android:fontFamily="@font/circularstd_book"
             android:text=""
             android:textSize="14sp" />
 

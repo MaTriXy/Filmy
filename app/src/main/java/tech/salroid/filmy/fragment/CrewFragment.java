@@ -3,16 +3,20 @@ package tech.salroid.filmy.fragment;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityOptionsCompat;
-import android.support.v4.app.Fragment;
-import android.support.v4.util.Pair;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.app.ActivityOptionsCompat;
+import androidx.core.util.Pair;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
@@ -45,7 +49,6 @@ import tech.salroid.filmy.parser.MovieDetailsActivityParseWork;
 
 public class CrewFragment extends Fragment implements View.OnClickListener, CrewAdapter.ClickListener {
 
-
     @BindView(R.id.crew_more)
     TextView more;
     @BindView(R.id.crew_recycler)
@@ -54,33 +57,32 @@ public class CrewFragment extends Fragment implements View.OnClickListener, Crew
     TextView card_holder;
     @BindView(R.id.breathingProgressFragment)
     BreathingProgress breathingProgress;
-    private String crew_json;
+    @BindView(R.id.detail_fragment_views_layout)
+    RelativeLayout relativeLayout;
+    private String jsonCrew;
     private String movieId, movieTitle;
 
-    public static CrewFragment newInstance(String movie_Id, String movie_Title) {
+    public static CrewFragment newInstance(String movieId, String movieTitle) {
 
         CrewFragment fragment = new CrewFragment();
         Bundle args = new Bundle();
-        args.putString("movie_id", movie_Id);
-        args.putString("movie_title", movie_Title);
+        args.putString("movie_id", movieId);
+        args.putString("movie_title", movieTitle);
         fragment.setArguments(args);
         return fragment;
     }
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.crew_fragment, container, false);
         ButterKnife.bind(this, view);
 
         crew_recycler.setLayoutManager(new LinearLayoutManager(getActivity()));
         crew_recycler.setNestedScrollingEnabled(false);
-
         crew_recycler.setVisibility(View.INVISIBLE);
-
         more.setOnClickListener(this);
-
 
         return view;
     }
@@ -101,74 +103,60 @@ public class CrewFragment extends Fragment implements View.OnClickListener, Crew
 
     }
 
+    public void parseCrewOutput(String crewResult) {
 
+        MovieDetailsActivityParseWork par = new MovieDetailsActivityParseWork(getActivity(), crewResult);
+        List<CrewDetailsData> crewList = par.parse_crew();
 
-    public void crew_parseOutput(String crew_result) {
+        jsonCrew = crewResult;
 
-        MovieDetailsActivityParseWork par = new MovieDetailsActivityParseWork(getActivity(), crew_result);
-        List<CrewDetailsData> crew_list = par.parse_crew();
+        CrewAdapter crewAdapter = new CrewAdapter(getActivity(), crewList, true);
+        crewAdapter.setClickListener(this);
+        crew_recycler.setAdapter(crewAdapter);
 
-        crew_json = crew_result;
-
-        CrewAdapter crew_adapter = new CrewAdapter(getActivity(), crew_list, true);
-        crew_adapter.setClickListener(this);
-        crew_recycler.setAdapter(crew_adapter);
-
-
-        if (crew_list.size() > 4)
+        if (crewList.size() > 4) {
             more.setVisibility(View.VISIBLE);
-        else if (crew_list.size() == 0) {
+        } else if (crewList.size() == 0) {
             more.setVisibility(View.INVISIBLE);
             card_holder.setVisibility(View.INVISIBLE);
-        } else
+        } else {
             more.setVisibility(View.INVISIBLE);
+        }
 
         breathingProgress.setVisibility(View.GONE);
         crew_recycler.setVisibility(View.VISIBLE);
 
-
+        relativeLayout.setMinimumHeight(0);
     }
 
 
     @Override
     public void onClick(View view) {
-
         if (view.getId() == R.id.crew_more) {
-
-            // Log.d("webi",""+movieTitle);
-
-            if (crew_json != null && movieTitle != null) {
-
+            Log.d("webi", "" + movieTitle);
+            if (jsonCrew != null && movieTitle != null) {
                 Intent intent = new Intent(getActivity(), FullCrewActivity.class);
-                intent.putExtra("crew_json", crew_json);
+                intent.putExtra("crew_json", jsonCrew);
                 intent.putExtra("toolbar_title", movieTitle);
                 startActivity(intent);
-
             }
         }
-
-
     }
-
 
     @Override
     public void itemClicked(CrewDetailsData setterGetter, int position, View view) {
 
         Intent intent = new Intent(getActivity(), CharacterDetailsActivity.class);
-        intent.putExtra("id", setterGetter.getCrew_id());
+        intent.putExtra("id", setterGetter.getCrewId());
 
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT) {
-
             Pair<View, String> p1 = Pair.create(view.findViewById(R.id.crew_poster), "profile");
             Pair<View, String> p2 = Pair.create(view.findViewById(R.id.crew_name), "name");
-
             ActivityOptionsCompat options = ActivityOptionsCompat.
                     makeSceneTransitionAnimation(getActivity(), p1, p2);
             startActivity(intent, options.toBundle());
-
         } else {
             startActivity(intent);
         }
-
     }
 }

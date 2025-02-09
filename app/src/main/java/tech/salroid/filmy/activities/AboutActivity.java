@@ -5,14 +5,20 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.net.Uri;
-import android.preference.PreferenceManager;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
-import android.view.Menu;
+import android.preference.PreferenceManager;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.browser.customtabs.CustomTabsIntent;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.res.ResourcesCompat;
+
+import com.bumptech.glide.Glide;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -42,7 +48,6 @@ public class AboutActivity extends AppCompatActivity {
     TextView logo;
     private boolean nightMode;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,25 +61,24 @@ public class AboutActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_developers);
 
-
         ButterKnife.bind(this);
-
         setSupportActionBar(toolbar);
 
         if (getSupportActionBar() != null){
-
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setTitle("");
         }
 
-
-        Typeface typeface = Typeface.createFromAsset(getAssets(), "fonts/canaro_extra_bold.otf");
+        Typeface typeface = ResourcesCompat.getFont(this,R.font.rubik);
         logo.setTypeface(typeface);
-
-
 
         if (nightMode)
             allThemeLogic();
+
+        Glide.with(this).load(getString(R.string.profile_webianks)).into((ImageView) findViewById(R.id.profile_webianks));
+        Glide.with(this).load(getString(R.string.profile_salroid)).into((ImageView) findViewById(R.id.profile_salroid));
+        Glide.with(this).load(getString(R.string.banner_webianks)).into((ImageView) findViewById(R.id.banner_webianks));
+        Glide.with(this).load(getString(R.string.banner_salroid)).into((ImageView) findViewById(R.id.banner_salroid));
 
     }
 
@@ -89,80 +93,64 @@ public class AboutActivity extends AppCompatActivity {
         if (item.getItemId() == android.R.id.home) {
             finish();
         }
-
         return super.onOptionsItemSelected(item);
     }
 
-
-
     public void sendEmail(View view) {
-
       switch (view.getId()){
-
-
-          case R.id.email:
-
+          case R.id.email_webianks:
               Intent emailIntent = new Intent(Intent.ACTION_SENDTO);
-              emailIntent.setData(Uri.parse("mailto: webianksc@gmailcom"));
+              emailIntent.setData(Uri.parse("mailto: webianks@gmail.com"));
               startActivity(Intent.createChooser(emailIntent, "Send feedback"));
+          break;
 
-              break;
-
-          case R.id.email2:
-
+          case R.id.email_salroid:
               Intent emailIntent2 = new Intent(Intent.ACTION_SENDTO);
-              emailIntent2.setData(Uri.parse("mailto: salroid@yahoo.com"));
+              emailIntent2.setData(Uri.parse("mailto: gupta.sajal631@gmail.com"));
               startActivity(Intent.createChooser(emailIntent2, "Send feedback"));
-
-              break;
-
+          break;
       }
-
-
     }
 
-
-    public void openGithub(View view) {
-        String url = getString(R.string.webianksgit);
-        String url2 = getString(R.string.salroidgit);
-
+    public void redirectGithub(View view) {
         switch (view.getId()){
-
-            case R.id.github:
-                viewIntent(url);
-                break;
-            case R.id.github2:
-                viewIntent(url2);
-                break;
+            case R.id.github_webianks:
+                CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
+                builder.setToolbarColor(ContextCompat.getColor(this, R.color.black));
+                CustomTabsIntent customTabsIntent = builder.build();
+                customTabsIntent.launchUrl(this, Uri.parse(getString(R.string.git_webianks)));
+            break;
+            case R.id.github_salroid:
+                CustomTabsIntent.Builder builder1 = new CustomTabsIntent.Builder();
+                builder1.setToolbarColor(ContextCompat.getColor(this, R.color.black));
+                CustomTabsIntent customTabsIntent1 = builder1.build();
+                customTabsIntent1.launchUrl(this, Uri.parse(getString(R.string.git_salroid)));
+            break;
         }
-
     }
 
     private void viewIntent(String url) {
-
         Intent i = new Intent(Intent.ACTION_VIEW);
         i.setData(Uri.parse(url));
         startActivity(i);
     }
 
-    public void openGplus(View view) {
-
-        String url = getString(R.string.ramzplus);
-        String url2 = getString(R.string.sajjuplus);
-
+    public void redirectWebsite(View view) {
         switch (view.getId()){
-
-            case R.id.gplus:
-                viewIntent(url);
-                break;
-            case R.id.gplus2:
-                viewIntent(url2);
-                break;
+            case R.id.website_webianks:
+                CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
+                builder.setToolbarColor(ContextCompat.getColor(this, R.color.colorAccent));
+                CustomTabsIntent customTabsIntent = builder.build();
+                customTabsIntent.launchUrl(this, Uri.parse(getString(R.string.website_webianks)));
+            break;
+            case R.id.website_salroid:
+                CustomTabsIntent.Builder builder1 = new CustomTabsIntent.Builder();
+                builder1.setToolbarColor(ContextCompat.getColor(this, R.color.black));
+                CustomTabsIntent customTabsIntent1 = builder1.build();
+                customTabsIntent1.launchUrl(this, Uri.parse(getString(R.string.website_salroid)));
+            break;
         }
-
-
     }
-
 
     @Override
     protected void onResume() {

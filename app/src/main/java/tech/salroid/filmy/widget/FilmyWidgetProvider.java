@@ -6,17 +6,11 @@ import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.net.Uri;
-import android.view.View;
 import android.widget.RemoteViews;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.AppWidgetTarget;
-import com.bumptech.glide.request.target.SimpleTarget;
 
 import tech.salroid.filmy.R;
 import tech.salroid.filmy.activities.MovieDetailsActivity;
@@ -42,10 +36,7 @@ import tech.salroid.filmy.database.MovieProjection;
 
 public class FilmyWidgetProvider extends AppWidgetProvider {
 
-    private AppWidgetTarget appWidgetTarget;
-
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
-
 
         final int N = appWidgetIds.length;
 
@@ -88,12 +79,11 @@ public class FilmyWidgetProvider extends AppWidgetProvider {
             final RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.filmy_appwidget);
             remoteViews.setTextViewText(R.id.widget_movie_name,movie_title);
 
-            appWidgetTarget = new AppWidgetTarget( context, remoteViews, R.id.widget_movie_image, appWidgetIds );
-
+            AppWidgetTarget appWidgetTarget = new AppWidgetTarget(context, R.id.widget_movie_image, remoteViews, appWidgetIds);
 
             Glide.with(context)
-                    .load(movie_poster)
                     .asBitmap()
+                    .load(movie_poster)
                     .into(appWidgetTarget);
 
 

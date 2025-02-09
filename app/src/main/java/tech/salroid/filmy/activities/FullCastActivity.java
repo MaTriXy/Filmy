@@ -5,13 +5,15 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v4.app.ActivityOptionsCompat;
-import android.support.v4.util.Pair;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityOptionsCompat;
+import androidx.core.util.Pair;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
@@ -41,8 +43,10 @@ import tech.salroid.filmy.parser.MovieDetailsActivityParseWork;
 
 public class FullCastActivity extends AppCompatActivity implements CastAdapter.ClickListener {
 
-    @BindView(R.id.toolbar) Toolbar toolbar;
-    @BindView(R.id.full_cast_recycler) RecyclerView full_cast_recycler;
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
+    @BindView(R.id.full_cast_recycler)
+    RecyclerView full_cast_recycler;
 
 
     private String cast_result;
@@ -71,8 +75,10 @@ public class FullCastActivity extends AppCompatActivity implements CastAdapter.C
         Intent intent = getIntent();
         if (intent != null) {
             cast_result = intent.getStringExtra("cast_json");
-            if(getSupportActionBar()!=null)
-            getSupportActionBar().setTitle(intent.getStringExtra("toolbar_title"));
+            if (getSupportActionBar() != null) {
+                getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                getSupportActionBar().setTitle(intent.getStringExtra("toolbar_title"));
+            }
         }
 
 
@@ -87,7 +93,7 @@ public class FullCastActivity extends AppCompatActivity implements CastAdapter.C
     @Override
     public void itemClicked(CastDetailsData setterGetter, int position, View view) {
         Intent intent = new Intent(this, CharacterDetailsActivity.class);
-        intent.putExtra("id", setterGetter.getCast_id());
+        intent.putExtra("id", setterGetter.getCastId());
 
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT) {
 
@@ -111,5 +117,15 @@ public class FullCastActivity extends AppCompatActivity implements CastAdapter.C
         boolean nightModeNew = sp.getBoolean("dark", false);
         if (nightMode!=nightModeNew)
             recreate();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+
+        if (item.getItemId() == android.R.id.home)
+            finish();
+
+        return super.onOptionsItemSelected(item);
     }
 }

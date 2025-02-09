@@ -1,13 +1,19 @@
-<img src="https://img.shields.io/badge/Android%20Arsenal-Filmy-blue.svg?style=flat">
+![Image](/img/banner_github.png)
 
-# Filmy
+[![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Filmy-blue.svg?style=flat)](https://android-arsenal.com/details/1/4110)
+[![License](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](https://github.com/salRoid/Filmy/blob/master/LICENCE)
+
 Open sourced awesome material designed movie app.
 
-<img src="http://www.webianks.com/filmy/launcher.png" height="128" width="128" >
+<img src="http://www.salroid.me/android/filmy_launcher.png" height="128" width="128" >
 
 # Screens
-<img src="http://www.webianks.com/filmy/a.png" align="right" height="700" width="400" >
-<img src="http://www.webianks.com/filmy/filmy.png"  height="700" width="400" >
+<img src="/img/screenshot1.png" vspace="5" align= "left" height="500" width="260">
+<img src="/img/screenshot2.png" vspace="5" align= "left"  height="500" width="260" >
+<img src="/img/screenshot3.png" vspace="5" height="500" width="260" >
+<img src="/img/screenshot4.png" vspace="5" align= "left" height="500" width="260" >
+<img src="/img/screenshot5.png" align= "left" vspace="5" height="500" width="260" >
+<img src="/img/screenshot6.png" vspace="5" height="500" width="260" >
 
 # APIs
 Filmy is powered by the tmdb.
@@ -38,6 +44,7 @@ Generate your own API Keys from  the following :
 <li><a href = 'https://www.themoviedb.org/documentation/api'>TMDB</a>
 <li><a href = 'https://fabric.io/kits/android/crashlytics/install'>Fabric</a>
 <li><a href= 'https://developers.google.com/youtube/v3/getting-started'>Youtube</a> 
+<li><a href= 'https://www.omdbapi.com/apikey.aspx'>OMDB</a> 
 </ul>
 
 <a href='https://play.google.com/store/apps/details?id=tech.salroid.filmy&utm_source=global_co&utm_medium=prtnr&utm_content=Mar2515&utm_campaign=PartBadge&pcampaignid=MKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img width="200px" alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png'/></a>
@@ -47,7 +54,7 @@ Generate your own API Keys from  the following :
 
 ```
 Filmy for Android
-Copyright (c) 2016 Sajal Gupta (http://github.com/salroid) ,
+Copyright (c) 2017 Sajal Gupta (http://github.com/salroid) ,
 Ramankit Singh (http://github.com.webianks).
 
 Licensed under the Apache License, Version 2.0 (the "License");

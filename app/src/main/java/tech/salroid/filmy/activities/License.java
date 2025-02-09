@@ -3,16 +3,17 @@ package tech.salroid.filmy.activities;
 import android.annotation.TargetApi;
 import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.os.Build;
-import android.preference.PreferenceManager;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
+import android.preference.PreferenceManager;
 import android.text.Html;
 import android.view.MenuItem;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.res.ResourcesCompat;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -85,23 +86,16 @@ public class License extends AppCompatActivity {
             getSupportActionBar().setTitle("");
         }
 
-        Typeface typeface = Typeface.createFromAsset(getAssets(), "fonts/canaro_extra_bold.otf");
+        Typeface typeface =  ResourcesCompat.getFont(this,R.font.rubik);
         logo.setTypeface(typeface);
-
-
 
         if (nightMode)
             allThemeLogic();
 
-
-        if (Build.VERSION.SDK_INT >= 24) {
+        if (Build.VERSION.SDK_INT >= 24)
           v24Setup();
-        } else {
+        else
             normalSetup();
-        }
-
-
-
     }
 
     private void normalSetup() {
@@ -137,13 +131,11 @@ public class License extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        if (item.getItemId() == android.R.id.home) {
+        if (item.getItemId() == android.R.id.home)
             finish();
-        }
 
         return super.onOptionsItemSelected(item);
     }
-
 
     @Override
     protected void onResume() {

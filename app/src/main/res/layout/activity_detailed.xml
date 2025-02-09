@@ -13,7 +13,7 @@
         <RelativeLayout
             android:id="@+id/main"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content">
 
             <FrameLayout
                 android:id="@+id/new_main"
@@ -21,6 +21,7 @@
                 android:layout_height="250dp"
                 android:clickable="true"
                 android:focusable="true"
+                android:focusableInTouchMode="true"
                 android:foreground="?android:selectableItemBackground">
 
                 <ImageView
@@ -51,14 +52,14 @@
                         android:id="@+id/detail_title"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:fontFamily="sans-serif-condensed"
+                        android:fontFamily="@font/circularstd_book"
                         android:textAppearance="?android:textAppearanceLarge" />
 
                     <TextView
                         android:id="@+id/detail_tagline"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:fontFamily="sans-serif-condensed"
+                        android:fontFamily="@font/circularstd_book"
                         android:textAppearance="?android:textAppearanceMedium"
                         android:visibility="gone" />
 
@@ -69,7 +70,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:ellipsize="end"
-                        android:fontFamily="sans-serif-condensed"
+                        android:fontFamily="@font/circularstd_book"
                         android:maxLines="4"
                         android:textAppearance="?android:textAppearanceSmall" />
 
@@ -123,36 +124,37 @@
 
 
 
-                    <RelativeLayout
+                    <FrameLayout
+                        android:id="@+id/youtube_icon_container"
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
+                        android:layout_height="match_parent"
                         android:layout_gravity="center_vertical"
                         android:layout_weight="3"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:background="?attr/selectableItemBackground"
                         android:orientation="horizontal">
 
                         <ImageView
-                            android:clickable="true"
                             android:id="@+id/youtube_icon"
                             android:layout_width="44dp"
                             android:layout_height="44dp"
-                            android:layout_centerInParent="true"
-                            android:src="@drawable/ic_action_video_library" />
+                            android:layout_gravity="center"
+                            android:src="@drawable/twotone_video_library_24" />
 
-                    </RelativeLayout>
+                    </FrameLayout>
 
 
                 </LinearLayout>
 
-                <include layout="@layout/ratings" />
-
+                <include layout="@layout/ratings"/>
                 <include layout="@layout/extra_info_movie_detail" />
 
                 <View
                     android:id="@+id/cast_divider"
                     android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="?attr/divider"
-
+                    android:layout_height="0dp"
+                    android:layout_marginTop="16dp"
                     />
 
             </LinearLayout>
@@ -164,12 +166,14 @@
                 android:layout_below="@id/movie_description" />
 
             <FrameLayout
+                android:layout_marginTop="16dp"
                 android:id="@+id/crew_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/cast_container" />
 
             <FrameLayout
+                android:layout_marginTop="16dp"
                 android:id="@+id/similar_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -179,17 +183,15 @@
 
     </ScrollView>
 
-    <android.support.v7.widget.Toolbar
+    <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/toolbar_margin"
         android:background="@drawable/toolbar_gradient_background"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <tech.salroid.filmy.customs.BreathingProgress
-
         android:id="@+id/breathingProgress"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

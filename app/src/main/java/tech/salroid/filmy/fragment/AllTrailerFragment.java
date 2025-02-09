@@ -20,39 +20,35 @@ package tech.salroid.filmy.fragment;
 import android.animation.Animator;
 import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.preference.PreferenceManager;
-import android.support.v4.app.Fragment;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.util.Log;
+import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.google.android.youtube.player.YouTubeStandalonePlayer;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
-import java.util.Arrays;
+import com.google.android.youtube.player.YouTubeStandalonePlayer;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import tech.salroid.filmy.R;
-import tech.salroid.filmy.activities.MovieDetailsActivity;
 import tech.salroid.filmy.custom_adapter.TrailerAdapter;
 
 public class AllTrailerFragment extends Fragment implements View.OnClickListener, TrailerAdapter.OnItemClickListener {
 
-    String titleValue;
-    String[] trailers;
-    String[] trailers_name;
-    RecyclerView recyclerView;
+    private String titleValue;
+    private String[] trailers;
+    private String[] trailers_name;
+    private RecyclerView recyclerView;
 
     @BindView(R.id.textViewTitle)
     TextView title;
@@ -70,7 +66,6 @@ public class AllTrailerFragment extends Fragment implements View.OnClickListener
 
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
         nightMode = sp.getBoolean("dark", false);
-
 
         View view = inflater.inflate(R.layout.all_trailer_layout, container, false);
         ButterKnife.bind(this, view);
@@ -148,7 +143,7 @@ public class AllTrailerFragment extends Fragment implements View.OnClickListener
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity(), LinearLayout.VERTICAL, false);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity(), RecyclerView.VERTICAL, false);
         recyclerView.setLayoutManager(linearLayoutManager);
         title.setText(titleValue);
         TrailerAdapter trailerAdapter = new TrailerAdapter(trailers, trailers_name, getActivity());
@@ -159,12 +154,17 @@ public class AllTrailerFragment extends Fragment implements View.OnClickListener
 
     @Override
     public void onClick(View view) {
-        getActivity().getSupportFragmentManager().beginTransaction().remove(this).commit();
+        if (getFragmentManager() != null) {
+            getFragmentManager().popBackStack();
+        }
     }
 
     @Override
-    public void itemClicked(String trailerId) {
-        startActivity(YouTubeStandalonePlayer.createVideoIntent(getActivity(),
-                getString(R.string.Youtube_Api_Key), trailerId));
+    public void itemClicked(final String trailerId) {
+        final int timeMiliSeconds = 0;
+        final boolean autoPlay = true;
+        final boolean lightBoxMode = false;
+       startActivity(YouTubeStandalonePlayer.createVideoIntent(getActivity(),getString(R.string.Youtube_Api_Key),
+               trailerId, timeMiliSeconds, autoPlay,lightBoxMode));
     }
 }

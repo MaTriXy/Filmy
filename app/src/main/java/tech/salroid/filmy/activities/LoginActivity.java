@@ -4,20 +4,20 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.customtabs.CustomTabsIntent;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.widget.TextView;
 
-import com.android.volley.Request;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.browser.customtabs.CustomTabsIntent;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.res.ResourcesCompat;
+
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -86,7 +86,7 @@ public class LoginActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
-        Typeface typeface = Typeface.createFromAsset(getAssets(), "fonts/canaro_extra_bold.otf");
+        Typeface typeface =  ResourcesCompat.getFont(this,R.font.rubik);
         logo.setTypeface(typeface);
 
 
@@ -128,10 +128,10 @@ public class LoginActivity extends AppCompatActivity {
 
     private void logInBackground() {
 
-        String api_key = BuildConfig.API_KEY;
+        String api_key = BuildConfig.TMDB_API_KEY;
         final String BASE_URL = "https://api.themoviedb.org/3/authentication/token/new?api_key="+api_key;
 
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, BASE_URL, null,
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(BASE_URL, null,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
@@ -194,7 +194,7 @@ public class LoginActivity extends AppCompatActivity {
 
         if (tokenization && requestToken!=null){
 
-            String api_key = BuildConfig.API_KEY;
+            String api_key = BuildConfig.TMDB_API_KEY;
             final String SESSION_QUERY = "https://api.themoviedb.org/3/authentication/session/new?api_key="+api_key+"&request_token=" + requestToken;
             querySession(SESSION_QUERY);
         }
@@ -204,18 +204,16 @@ public class LoginActivity extends AppCompatActivity {
 
     private void querySession(String session_query) {
 
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, session_query, null,
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(session_query, null,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
-
                         parseSession(response);
                     }
 
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-
                 Log.e("webi", "Volley Error: " + error.getCause());
 
             }

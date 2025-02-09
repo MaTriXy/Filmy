@@ -1,4 +1,5 @@
-<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     android:id="@+id/toast_layout_root"
     android:layout_width="fill_parent"
@@ -6,7 +7,7 @@
     android:layout_marginBottom="32dp"
     android:padding="10dp"
     card_view:cardBackgroundColor="@color/grey"
-    card_view:cardElevation="5dp"
+    card_view:cardElevation="2dp"
     card_view:cardCornerRadius="20dp"
     card_view:cardPreventCornerOverlap="false"
     >
@@ -34,9 +35,9 @@
             android:padding="16dp"
             android:layout_marginRight="32dp"
             android:layout_toRightOf="@id/image"
-            android:fontFamily="sans-serif-condensed"
+            android:fontFamily="@font/circularstd_book"
             android:text="Failed once again."
             android:textColor="@color/dark" />
     </RelativeLayout>
 
-</android.support.v7.widget.CardView>
+</com.google.android.material.card.MaterialCardView>

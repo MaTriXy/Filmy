@@ -7,15 +7,9 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.graphics.Palette;
-import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -25,17 +19,27 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.browser.customtabs.CustomTabsIntent;
+import androidx.core.content.ContextCompat;
+import androidx.loader.app.LoaderManager;
+import androidx.loader.content.CursorLoader;
+import androidx.loader.content.Loader;
+import androidx.palette.graphics.Palette;
+
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.google.android.youtube.player.YouTubeStandalonePlayer;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.Arrays;
 import java.util.HashMap;
 
 import butterknife.BindView;
@@ -54,9 +58,9 @@ import tech.salroid.filmy.fragment.CrewFragment;
 import tech.salroid.filmy.fragment.FullReadFragment;
 import tech.salroid.filmy.fragment.SimilarFragment;
 import tech.salroid.filmy.network_stuff.GetDataFromNetwork;
-import tech.salroid.filmy.tmdb_account.MarkingFavorite;
-import tech.salroid.filmy.tmdb_account.MarkingWatchList;
 import tech.salroid.filmy.utility.Confirmation;
+import tech.salroid.filmy.utility.Constants;
+import tech.salroid.filmy.utility.FilmyUtility;
 import tech.salroid.filmy.utility.NullChecker;
 
 /*
@@ -129,6 +133,9 @@ public class MovieDetailsActivity extends AppCompatActivity implements
     @BindView(R.id.youtube_icon)
     ImageView youtubeIcon;
 
+    @BindView(R.id.youtube_icon_container)
+    FrameLayout youtubeIconContainer;
+
     @BindView(R.id.trailorView)
     FrameLayout trailorView;
     @BindView(R.id.new_main)
@@ -171,7 +178,7 @@ public class MovieDetailsActivity extends AppCompatActivity implements
 
     Context context = this;
     String[] trailer_array;
-    String [] trailer_array_name;
+    String[] trailer_array_name;
     FullReadFragment fullReadFragment;
     AllTrailerFragment allTrailerFragment;
     HashMap<String, String> movieMap;
@@ -196,6 +203,7 @@ public class MovieDetailsActivity extends AppCompatActivity implements
     private SimilarFragment similarFragment;
     private String movie_rating_audience;
     private String movie_rating_metascore;
+    private String movie_title_hyphen;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -225,14 +233,18 @@ public class MovieDetailsActivity extends AppCompatActivity implements
         if (getSupportActionBar() != null)
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        int statusBarHeight = FilmyUtility.getStatusBarHeight(this);
+        FrameLayout.LayoutParams toolbarParams = (FrameLayout.LayoutParams) toolbar.getLayoutParams();
+        toolbarParams.setMargins(0,statusBarHeight,0,0);
+
 
         SharedPreferences prefrence = PreferenceManager.getDefaultSharedPreferences(MovieDetailsActivity.this);
-        quality = prefrence.getString("image_quality", "w1000");
+        quality = prefrence.getString("image_quality", "original");
 
         headerContainer.setOnClickListener(this);
         newMain.setOnClickListener(this);
         trailorView.setOnClickListener(this);
-        youtubeIcon.setOnClickListener(this);
+        youtubeIconContainer.setOnClickListener(this);
 
 
         Intent intent = getIntent();
@@ -273,13 +285,11 @@ public class MovieDetailsActivity extends AppCompatActivity implements
         if (nightMode != nightModeNew)
             recreate();
 
-
-        RevealAnimation.performReveal(main_content);
         performDataFetching();
 
-        showCastFragment();
+        /* showCastFragment(); //TODO :: salroid finds it un-necessary
         showCrewFragment();
-        showSimilarFragment();
+        showSimilarFragment();*/
     }
 
     private void performDataFetching() {
@@ -366,7 +376,7 @@ public class MovieDetailsActivity extends AppCompatActivity implements
 
             movie_id_final = jsonObject.getString("id");
             movie_imdb_id = jsonObject.getString("imdb_id");
-
+            movie_title_hyphen = movie_title.replace(' ', '-');
             movie_rating_tmdb = jsonObject.getString("vote_average");
 
             if (!(tagline.equals("")))
@@ -496,21 +506,22 @@ public class MovieDetailsActivity extends AppCompatActivity implements
         det_tagline.setText(tagline);
         det_title.setText(title);
         det_overview.setText(overview);
-        // det_rating.setText(rating);
+        //det_rating.setText(rating);
         det_runtime.setText(runtime);
         det_released.setText(released);
         det_certification.setText(certification);
         det_language.setText(language);
 
+
         try {
             Glide.with(context)
-                    .load(banner_profile)
                     .asBitmap()
+                    .load(banner_profile)
                     .diskCacheStrategy(DiskCacheStrategy.NONE)
                     .into(new SimpleTarget<Bitmap>() {
-                        @Override
-                        public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
 
+                        @Override
+                        public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
                             banner.setImageBitmap(resource);
                             Palette.from(resource).generate(new Palette.PaletteAsyncListener() {
                                 public void onGenerated(Palette p) {
@@ -531,6 +542,7 @@ public class MovieDetailsActivity extends AppCompatActivity implements
                                 }
                             });
                         }
+
                     });
 
         } catch (Exception e) {
@@ -539,15 +551,17 @@ public class MovieDetailsActivity extends AppCompatActivity implements
         try {
 
             Glide.with(context)
-                    .load(img_url).asBitmap().diskCacheStrategy(DiskCacheStrategy.NONE)
+                    .asBitmap()
+                    .load(img_url)
+                    .diskCacheStrategy(DiskCacheStrategy.NONE)
                     .into(new SimpleTarget<Bitmap>() {
+
                         @Override
-                        public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+                        public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
                             youtube_link.setImageBitmap(resource);
                             if (trailer_boolean)
                                 youtube_play_button.setVisibility(View.VISIBLE);
                         }
-
                     });
         } catch (Exception e) {
             //Log.d(LOG_TAG, e.getMessage());
@@ -600,7 +614,7 @@ public class MovieDetailsActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+    public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor data) {
 
         int id = loader.getId();
 
@@ -652,7 +666,7 @@ public class MovieDetailsActivity extends AppCompatActivity implements
             det_tagline.setText(tagline);
             det_title.setText(title);
             det_overview.setText(overview);
-            // det_rating.setText(rating);
+            //det_rating.setText(rating);
             det_runtime.setText(runtime);
             det_released.setText(released);
             det_certification.setText(certification);
@@ -661,16 +675,17 @@ public class MovieDetailsActivity extends AppCompatActivity implements
             movie_desc = overview;
             show_centre_img_url = banner_url;
 
+
             try {
 
                 Glide.with(context)
-                        .load(banner_url)
                         .asBitmap()
+                        .load(banner_url)
                         .diskCacheStrategy(DiskCacheStrategy.NONE)
                         .into(new SimpleTarget<Bitmap>() {
-                            @Override
-                            public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
 
+                            @Override
+                            public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
                                 banner.setImageBitmap(resource);
                                 Palette.from(resource).generate(new Palette.PaletteAsyncListener() {
                                     public void onGenerated(Palette p) {
@@ -690,8 +705,8 @@ public class MovieDetailsActivity extends AppCompatActivity implements
                                         }
                                     }
                                 });
-
                             }
+
                         });
             } catch (Exception e) {
                 //Log.d(LOG_TAG, e.getMessage());
@@ -709,12 +724,12 @@ public class MovieDetailsActivity extends AppCompatActivity implements
             try {
 
                 Glide.with(context)
-                        .load(thumbNail)
                         .asBitmap()
+                        .load(thumbNail)
                         .diskCacheStrategy(DiskCacheStrategy.NONE)
                         .into(new SimpleTarget<Bitmap>() {
                             @Override
-                            public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+                            public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
                                 youtube_link.setImageBitmap(resource);
                                 if (trailer_boolean)
                                     youtube_play_button.setVisibility(View.VISIBLE);
@@ -777,12 +792,13 @@ public class MovieDetailsActivity extends AppCompatActivity implements
 
             try {
                 Glide.with(context)
-                        .load(banner_url)
                         .asBitmap()
+                        .load(banner_url)
                         .diskCacheStrategy(DiskCacheStrategy.NONE)
                         .into(new SimpleTarget<Bitmap>() {
+
                             @Override
-                            public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+                            public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
 
                                 banner.setImageBitmap(resource);
 
@@ -804,8 +820,8 @@ public class MovieDetailsActivity extends AppCompatActivity implements
                                         }
                                     }
                                 });
-
                             }
+
                         });
             } catch (Exception e) {
                 //Log.d(LOG_TAG, e.getMessage());
@@ -814,17 +830,17 @@ public class MovieDetailsActivity extends AppCompatActivity implements
             try {
 
                 Glide.with(context)
-                        .load(trailer)
                         .asBitmap()
+                        .load(trailer)
                         .diskCacheStrategy(DiskCacheStrategy.NONE)
                         .into(new SimpleTarget<Bitmap>() {
+
                             @Override
-                            public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+                            public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
                                 youtube_link.setImageBitmap(resource);
                                 if (trailer_boolean)
                                     youtube_play_button.setVisibility(View.VISIBLE);
                             }
-
                         });
             } catch (Exception e) {
                 //Log.d(LOG_TAG, e.getMessage());
@@ -853,19 +869,19 @@ public class MovieDetailsActivity extends AppCompatActivity implements
                 break;
 
             case R.id.action_save:
-                OfflineMovies offlineMovies = new OfflineMovies(this, main_content);
-                offlineMovies.saveMovie(movieMap, movie_id, movie_id_final);
+                OfflineMovies offlineMovies = new OfflineMovies(this);
+                offlineMovies.saveMovie(movieMap, movie_id, movie_id_final, Constants.FLAG_OFFLINE);
                 break;
 
             case R.id.action_fav:
 
-                Confirmation.confirmFav(this,movie_id);
+                Confirmation.confirmFav(this, movieMap, movie_id, movie_id_final, Constants.FLAG_FAVORITE);
 
                 break;
 
             case R.id.action_watch:
 
-                Confirmation.confirmWatchlist(this,movie_id);
+                Confirmation.confirmWatchlist(this, movieMap, movie_id, movie_id_final, Constants.FLAG_WATCHLIST);
 
                 break;
 
@@ -884,6 +900,7 @@ public class MovieDetailsActivity extends AppCompatActivity implements
             super.onBackPressed();
         } else {
             getFragmentManager().popBackStack();
+
         }
 
     }
@@ -921,24 +938,28 @@ public class MovieDetailsActivity extends AppCompatActivity implements
                 break;
 
             case R.id.trailorView:
+                final int timeMiliSeconds = 0;
+                final boolean autoPlay = true;
+                final boolean lightBoxMode = false;
                 if ((trailer_boolean))
                     startActivity(YouTubeStandalonePlayer.createVideoIntent(MovieDetailsActivity.this,
-                            getString(R.string.Youtube_Api_Key), trailor));
+                            getString(R.string.Youtube_Api_Key), trailor,timeMiliSeconds,autoPlay,lightBoxMode));
 
                 break;
-            case R.id.youtube_icon:
+            case R.id.youtube_icon_container:
                 if (trailer_boolean) {
                     allTrailerFragment = new AllTrailerFragment();
-                   // Log.d(TAG, "onClick: "+ Arrays.toString(trailer_array));
+                    // Log.d(TAG, "onClick: "+ Arrays.toString(trailer_array));
                     Bundle args = new Bundle();
                     args.putString("title", movie_title);
-                    args.putStringArray("trailers",trailer_array);
-                    args.putStringArray("trailers_name",trailer_array_name);
+                    args.putStringArray("trailers", trailer_array);
+                    args.putStringArray("trailers_name", trailer_array_name);
                     allTrailerFragment.setArguments(args);
                     getSupportFragmentManager().beginTransaction()
                             .replace(R.id.all_details_container, allTrailerFragment).addToBackStack("TRAILER").commit();
                 }
                 break;
+
         }
 
     }
@@ -948,7 +969,6 @@ public class MovieDetailsActivity extends AppCompatActivity implements
         switch (code) {
 
             case GetDataFromNetwork.MOVIE_DETAILS_CODE:
-
                 parseMovieDetails(response);
                 // showCastFragment();
                 break;
@@ -964,7 +984,7 @@ public class MovieDetailsActivity extends AppCompatActivity implements
         if (!(movie_title == null && movie_rating.equals("null") && movie_imdb_id.equals("null"))) {
             Intent myIntent = new Intent(Intent.ACTION_SEND);
             myIntent.setType("text/plain");
-            myIntent.putExtra(Intent.EXTRA_TEXT, "*" + movie_title + "*\n" + movie_tagline + "\nRating: " + movie_rating + " / 10\n" + movie_imdb + "\n");
+            myIntent.putExtra(Intent.EXTRA_TEXT, "*" + movie_title + "*\n" + movie_tagline + "\n" + movie_imdb + "\n");
             startActivity(Intent.createChooser(myIntent, "Share with"));
         }
     }
@@ -981,31 +1001,61 @@ public class MovieDetailsActivity extends AppCompatActivity implements
     public void gotCrew(String crewData) {
 
         if (crewFragment != null)
-            crewFragment.crew_parseOutput(crewData);
+            crewFragment.parseCrewOutput(crewData);
     }
 
     public void setRating(String movie_rating_imdb, String movie_rating_tomatometer,
-                          String audience_rating, String metascore_rating, String image) {
+                          String audience_rating, String metascore_rating, final String rottenTomatoPage) {
 
         movie_rating_audience = audience_rating;
         movie_rating_metascore = metascore_rating;
 
         if (movie_rating_imdb.equals("N/A"))
             layout_imdb.setVisibility(View.GONE);
-        else
+        else {
             rating_of_imdb.setText(movie_rating_imdb);
-
+            layout_imdb.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
+                    builder.setToolbarColor(ContextCompat.getColor(MovieDetailsActivity.this, R.color.imdbYellow));
+                    CustomTabsIntent customTabsIntent = builder.build();
+                    customTabsIntent.launchUrl(MovieDetailsActivity.this, Uri.parse(getResources().getString(R.string.imdb_link_prefix) + movie_imdb_id));
+                }
+            });
+        }
 
         if (movie_rating_tomatometer.equals("N/A"))
             layout_tomato.setVisibility(View.GONE);
         else {
-            if (image.equals("certified"))
+
+           /* if (image.equals("certified"))
                 tomatoRating_image.setImageDrawable(getResources().getDrawable(R.drawable.certified));
             else if (image.equals("fresh"))
                 tomatoRating_image.setImageDrawable(getResources().getDrawable(R.drawable.fresh));
             else if (image.equals("rotten"))
+                tomatoRating_image.setImageDrawable(getResources().getDrawable(R.drawable.rotten));*/
+
+            // Image Logic Changed According to %age due to OMDB API limitations
+
+            int tomatometer_score = Integer.parseInt(movie_rating_tomatometer.substring(0, movie_rating_tomatometer.length() - 1));
+            if (tomatometer_score > 74)
+                tomatoRating_image.setImageDrawable(getResources().getDrawable(R.drawable.certified));
+            else if (tomatometer_score > 59)
+                tomatoRating_image.setImageDrawable(getResources().getDrawable(R.drawable.fresh));
+            else if (tomatometer_score < 60)
                 tomatoRating_image.setImageDrawable(getResources().getDrawable(R.drawable.rotten));
+
             tomato_rating.setText(movie_rating_tomatometer);
+            layout_tomato.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
+                    builder.setToolbarColor(ContextCompat.getColor(MovieDetailsActivity.this, R.color.tomatoRed));
+                    CustomTabsIntent customTabsIntent = builder.build();
+                    customTabsIntent.launchUrl(MovieDetailsActivity.this, Uri.parse(rottenTomatoPage));
+                }
+            });
         }
 
         if (movie_rating_audience.equals("N/A"))
@@ -1027,29 +1077,50 @@ public class MovieDetailsActivity extends AppCompatActivity implements
             layout_meta.setVisibility(View.GONE);
 
         else {
-
+            String smallTitle = movie_title_hyphen.toLowerCase();
+            smallTitle =  smallTitle.replaceAll("[^0-9-a-z]","");
+            final String url = "http://www.metacritic.com/movie/"+smallTitle;
             int metasco_rating = Integer.valueOf(metascore_rating);
-
             if (metasco_rating > 60)
                 metaRating_background.setBackgroundColor(Color.parseColor("#66cc33"));
+
             else if (metasco_rating > 40 && metasco_rating < 61)
                 metaRating_background.setBackgroundColor(Color.parseColor("#ffcc33"));
+
             else
                 metaRating_background.setBackgroundColor(Color.parseColor("#ff0000"));
 
 
             meta_rating.setText(movie_rating_metascore);
             metascore_setter.setText(movie_rating_metascore);
-
+            layout_meta.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
+                    builder.setToolbarColor(ContextCompat.getColor(MovieDetailsActivity.this, R.color.metaBlack));
+                    CustomTabsIntent customTabsIntent = builder.build();
+                    customTabsIntent.launchUrl(MovieDetailsActivity.this, Uri.parse(url));
+                }
+            });
         }
 
         if (movie_rating_tmdb.equals("0"))
             layout_tmdb.setVisibility(View.GONE);
-
-        else
+        else {
             det_rating.setText(movie_rating_tmdb);
-
-
+            layout_tmdb.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
+                    builder.setToolbarColor(ContextCompat.getColor(MovieDetailsActivity.this, R.color.tmdbGreen));
+                    CustomTabsIntent customTabsIntent = builder.build();
+                    customTabsIntent.launchUrl(MovieDetailsActivity.this, Uri.parse("https://www.themoviedb.org/movie/" + movie_id + "-" + movie_title_hyphen));
+                }
+            });
+        }
     }
 
+    public void setRatingGone() {
+        ratingBar.setVisibility(View.GONE);
+    }
 }

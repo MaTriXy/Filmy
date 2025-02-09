@@ -2,18 +2,17 @@ package tech.salroid.filmy.network_stuff;
 
 import android.content.Context;
 import android.content.Intent;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
 import com.android.volley.NetworkResponse;
-import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import org.json.JSONObject;
+
 import tech.salroid.filmy.BuildConfig;
 import tech.salroid.filmy.parser.MainActivityParseWork;
-import tech.salroid.filmy.services.FilmyJobScheduler;
+import tech.salroid.filmy.work_manager.FilmyWorkManager;
 
 /*
  * Filmy Application for Android
@@ -36,8 +35,8 @@ public class FirstFetch {
 
 
     private Context context;
-    TmdbVolleySingleton tmdbVolleySingleton = TmdbVolleySingleton.getInstance();
-    RequestQueue tmdbrequestQueue = tmdbVolleySingleton.getRequestQueue();
+    private TmdbVolleySingleton tmdbVolleySingleton = TmdbVolleySingleton.getInstance();
+    private RequestQueue tmdbRequestQueue = tmdbVolleySingleton.getRequestQueue();
 
     public FirstFetch(Context context){
         this.context = context;
@@ -49,111 +48,66 @@ public class FirstFetch {
         syncNowInTheaters();
         syncNowUpComing();
 
-        FilmyJobScheduler filmyJobScheduler = new FilmyJobScheduler(context);
-        filmyJobScheduler.createJob();
+        FilmyWorkManager workManager = new FilmyWorkManager(context);
+        workManager.createWork();
     }
 
 
     private void syncNowInTheaters() {
 
+        String api_key = BuildConfig.TMDB_API_KEY;
+        final String inTheatresBaseUrl = "https://api.themoviedb.org/3/movie/now_playing?api_key="+api_key;
+        JsonObjectRequest inTheatresJsonObjectRequest = new JsonObjectRequest(inTheatresBaseUrl, null,
+                response -> inTheatresParseOutput(response.toString(), 2), error -> Log.e("webi", "Volley Error: " + error.getCause()));
 
-        String api_key = BuildConfig.API_KEY;
-
-        final String Intheatres_Base_URL = "https://api.themoviedb.org/3/movie/now_playing?api_key="+api_key;
-
-        JsonObjectRequest IntheatresJsonObjectRequest = new JsonObjectRequest(Request.Method.GET, Intheatres_Base_URL, null,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-
-                        intheatresparseOutput(response.toString(), 2);
-                    }
-
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-
-                Log.e("webi", "Volley Error: " + error.getCause());
-
-            }
-        });
-
-
-        tmdbrequestQueue.add(IntheatresJsonObjectRequest);
+        tmdbRequestQueue.add(inTheatresJsonObjectRequest);
 
     }
 
     private void syncNowUpComing() {
 
 
-        String api_key = BuildConfig.API_KEY;
+        String api_key = BuildConfig.TMDB_API_KEY;
         final String Upcoming_Base_URL = "https://api.themoviedb.org/3/movie/upcoming?api_key="+api_key;
 
-        JsonObjectRequest UpcomingJsonObjectRequest = new JsonObjectRequest(Request.Method.GET, Upcoming_Base_URL, null,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
+        JsonObjectRequest UpcomingJsonObjectRequest = new JsonObjectRequest(Upcoming_Base_URL, null,
+                response -> upcomingParseOutput(response.toString()), error -> Log.e("webi", "Volley Error: " + error.getCause()));
 
-                        upcomingparseOutput(response.toString());
-                    }
-
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-
-                Log.e("webi", "Volley Error: " + error.getCause());
-
-            }
-        });
-
-        tmdbrequestQueue.add(UpcomingJsonObjectRequest);
+        tmdbRequestQueue.add(UpcomingJsonObjectRequest);
 
     }
 
     private void syncNowTrending() {
 
-        String api_key = BuildConfig.API_KEY;
+        String api_key = BuildConfig.TMDB_API_KEY;
         final String BASE_URL = "https://api.themoviedb.org/3/movie/popular?api_key="+api_key;
 
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, BASE_URL, null,
-                new Response.Listener<JSONObject>() {
-                    @Override
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(BASE_URL, null,
+                response -> parseOutput(response.toString()), error -> {
 
-                    public void onResponse(JSONObject response) {
-
-                        parseOutput(response.toString());
+                    NetworkResponse networkResponse = error.networkResponse;
+                    if (networkResponse != null) {
+                        sendFetchFailedMessage(networkResponse.statusCode);
+                    } else {
+                        sendFetchFailedMessage(00);
                     }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-
-                NetworkResponse networkResponse = error.networkResponse;
-                if (networkResponse != null) {
-                    sendFetchFailedMessage(networkResponse.statusCode);
-                } else {
-
-                    sendFetchFailedMessage(00);
-
                 }
-
-            }
-        }
         );
 
-        tmdbrequestQueue.add(jsonObjectRequest);
+        tmdbRequestQueue.add(jsonObjectRequest);
 
     }
 
-    private void intheatresparseOutput(String s, int type) {
+    private void inTheatresParseOutput(String s, int type) {
 
         MainActivityParseWork pa = new MainActivityParseWork(context, s);
-        pa.intheatres();
+        pa.inTheatres();
 
     }
 
-    private void upcomingparseOutput(String result_upcoming) {
+    private void upcomingParseOutput(String result_upcoming) {
         MainActivityParseWork pa = new MainActivityParseWork(context, result_upcoming);
-        pa.parseupcoming();
+        pa.parseUpcoming();
     }
 
 

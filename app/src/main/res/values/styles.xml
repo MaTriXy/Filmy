@@ -1,10 +1,10 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="AppTheme.Base"></style>
+    <style name="AppTheme" parent="AppTheme.Base" />
     <!-- Customize your theme here. -->
 
-    <style name="AppTheme.Base" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="AppTheme.Base" parent="Theme.MaterialComponents.Light.NoActionBar">
 
         <item name="colorPrimary">@color/primaryColor</item>
         <item name="colorPrimaryDark">@color/primaryColorDark</item>
@@ -14,8 +14,13 @@
     </style>
 
 
+    <style name="AppTheme.Base.Dialog" parent="Theme.MaterialComponents.Light.Dialog">
 
-    <style name="AppTheme.Base.Dark" parent="Theme.AppCompat.NoActionBar">
+        <item name="colorPrimary">@color/colorAccent</item>
+
+    </style>
+
+    <style name="AppTheme.Base.Dark" parent="Theme.MaterialComponents.NoActionBar">
 
         <item name="colorPrimary">@color/colorDarkThemePrimary</item>
         <item name="colorPrimaryDark">@color/colorDarkThemePrimaryDark</item>
@@ -23,8 +28,6 @@
         <item name="divider">@color/dividerColorDarkTheme</item>
 
     </style>
-
-
 
 
     <style name="FullScreenTheme" parent="Theme.AppCompat.Light.NoActionBar">
@@ -87,8 +90,8 @@
     </style>
 
     <color name="white">#ffffff</color>
-    <color name="colorDarkThemePrimary">#042233</color>
-    <color name="colorDarkThemePrimaryDark">#031621</color>
+    <color name="colorDarkThemePrimary">#1D1D1D</color>
+    <color name="colorDarkThemePrimaryDark">#121212</color>
 
     <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>

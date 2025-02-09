@@ -53,14 +53,14 @@
     <string name="error_retry">WIEDERHOLEN</string>
 
 
-    <string name="ramankit">Ramankit Singh</string>
-    <string name="sajal">Sajal Gupta</string>
+    <string name="name_webianks">Ramankit Singh</string>
+    <string name="name_salroid">Sajal Gupta</string>
     <string name="email">Sende eine Email</string>
-    <string name="gplus">Google+</string>
+    <string name="website">Webseite</string>
     <string name="github">Github</string>
 
-    <string name="ramankit_bio">Ich mag Android, Design und Musik.</string>
-    <string name="sajal_bio">Ich mag Android und Counter Strike.</string>
+    <string name="bio_webianks">Ich mag Android, Design und Musik.</string>
+    <string name="bio_salroid">Der mit Teufel auf der anderen Seite des Spiegels.</string>
 
     <string name="shareappdetails">Teile diese App</string>
     <string name="dark">Nacht Modus</string>
@@ -77,9 +77,10 @@
     <string name="login_normal">Anmeldung</string>
     <string name="trailers">Anhänger</string>
     <string name="favourite">Favoriten</string>
-    <string name="your_favourite_movie_appear_here">Ihr Lieblingsfilm erscheint hier</string>
-    <string name="your_watchlist_appear_here">Ihr Watchlist erscheint hier</string>
+    <string name="your_fav_movies_appear_here">Ihr Lieblingsfilm erscheint hier</string>
+    <string name="your_watchlist_movies_appear_here">Ihr Watchlist erscheint hier</string>
     <string name="you_dont_hav_fav">Keine Filme in der Liste</string>
+
 
 
 </resources>

@@ -47,7 +47,6 @@ public class MainActivityParseWork {
         //final List<MovieData> movieDataArrayList = new ArrayList<MovieData>();
         //MovieData movieData = null;
 
-
         try {
 
             JSONObject jsonObject = new JSONObject(result);
@@ -64,7 +63,7 @@ public class MainActivityParseWork {
                 poster = (jsonArray.getJSONObject(i).getString("poster_path"));
                 id = (jsonArray.getJSONObject(i)).getString("id");
 
-                String temp_year[] = (jsonArray.getJSONObject(i)).getString("release_date").split("-");
+                String[] temp_year = (jsonArray.getJSONObject(i)).getString("release_date").split("-");
                 String year = temp_year[0];
 
 
@@ -116,10 +115,9 @@ public class MainActivityParseWork {
         } catch (JSONException e1) {
             e1.printStackTrace();
         }
-        return;
     }
 
-    public void parseupcoming() {
+    public void parseUpcoming() {
 
         try {
 
@@ -137,7 +135,7 @@ public class MainActivityParseWork {
                 poster = (jsonArray.getJSONObject(i).getString("poster_path"));
                 id = (jsonArray.getJSONObject(i)).getString("id");
 
-                String temp_year[] = (jsonArray.getJSONObject(i)).getString("release_date").split("-");
+                String[] temp_year = (jsonArray.getJSONObject(i)).getString("release_date").split("-");
                 String year = temp_year[0];
 
 
@@ -179,11 +177,10 @@ public class MainActivityParseWork {
         } catch (JSONException e1) {
             e1.printStackTrace();
         }
-        return;
     }
 
 
-    public void intheatres() {
+    public void inTheatres() {
         try {
 
 
@@ -202,7 +199,7 @@ public class MainActivityParseWork {
                 id = (jsonArray.getJSONObject(i)).getString("id");
 
 
-                String temp_year[] = (jsonArray.getJSONObject(i)).getString("release_date").split("-");
+                String[] temp_year = (jsonArray.getJSONObject(i)).getString("release_date").split("-");
                 String year = temp_year[0];
 
                 String trimmedQuery = (title.toLowerCase()).trim();
@@ -238,7 +235,6 @@ public class MainActivityParseWork {
         } catch (JSONException e1) {
             e1.printStackTrace();
         }
-        return;
 
     }
 

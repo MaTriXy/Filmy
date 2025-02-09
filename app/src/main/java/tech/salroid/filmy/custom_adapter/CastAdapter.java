@@ -1,16 +1,20 @@
 package tech.salroid.filmy.custom_adapter;
 
 import android.content.Context;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.mikhaellopez.circularimageview.CircularImageView;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import tech.salroid.filmy.R;
@@ -36,14 +40,14 @@ import tech.salroid.filmy.data_classes.CastDetailsData;
 public class CastAdapter extends RecyclerView.Adapter<CastAdapter.Ho> {
 
     private final Boolean ret_size;
-    private List<CastDetailsData> cast = new ArrayList<>();
+    private List<CastDetailsData> castList = new ArrayList<>();
     private Context context;
     private ClickListener clickListener;
 
-    public CastAdapter(Context context, List<CastDetailsData> cast, Boolean size) {
+    public CastAdapter(Context context, List<CastDetailsData> castList, Boolean size) {
 
         this.context = context;
-        this.cast = cast;
+        this.castList = castList;
         this.ret_size = size;
 
     }
@@ -59,35 +63,32 @@ public class CastAdapter extends RecyclerView.Adapter<CastAdapter.Ho> {
     @Override
     public void onBindViewHolder(Ho holder, int position) {
 
-        String ct_name = cast.get(position).getCast_name();
-        String ct_desc = cast.get(position).getCast_character();
-        String ct_profile = cast.get(position).getCast_profile();
-        String ct_id = cast.get(position).getCast_id();
+        String castName = castList.get(position).getCastName();
+        String castCharacter = castList.get(position).getCastCharacter();
+        String castDisplayProfile = castList.get(position).getCastDisplayProfile();
+        String castId = castList.get(position).getCastId();
 
-        holder.cast_name.setText(ct_name);
-        holder.cast_description.setText(ct_desc);
+        holder.castName.setText(castName);
+        holder.castCharacter.setText(castCharacter);
 
         try {
             Glide.with(context)
-                    .load(ct_profile)
+                    .load(castDisplayProfile)
                     .diskCacheStrategy(DiskCacheStrategy.NONE)
                     .fitCenter()
-                    .into(holder.cast_poster);
-        } catch (Exception e){
+                    .into(holder.castDisplayProfile);
+        } catch (Exception e) {
         }
 
     }
 
-
     @Override
     public int getItemCount() {
-
-        if (ret_size)
-            return (cast.size() >= 5) ? 5 : cast.size();
-
-        else
-            return cast.size();
-
+        if (ret_size) {
+            return Math.min(castList.size(), 5);
+        } else {
+            return castList.size();
+        }
     }
 
     public void setClickListener(ClickListener clickListener) {
@@ -103,27 +104,22 @@ public class CastAdapter extends RecyclerView.Adapter<CastAdapter.Ho> {
     class Ho extends RecyclerView.ViewHolder {
 
         @BindView(R.id.cast_name)
-        TextView cast_name;
+        TextView castName;
         @BindView(R.id.cast_description)
-        TextView cast_description;
+        TextView castCharacter;
         @BindView(R.id.cast_poster)
-        CircularImageView cast_poster;
+        CircularImageView castDisplayProfile;
 
         Ho(View itemView) {
 
             super(itemView);
             ButterKnife.bind(this, itemView);
 
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if (clickListener != null) {
-                        clickListener.itemClicked(cast.get(getPosition()), getPosition(),view);
-                    }
+            itemView.setOnClickListener(view -> {
+                if (clickListener != null) {
+                    clickListener.itemClicked(castList.get(getPosition()), getPosition(), view);
                 }
             });
         }
     }
-
-
 }

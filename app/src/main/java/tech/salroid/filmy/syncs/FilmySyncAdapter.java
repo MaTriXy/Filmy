@@ -62,7 +62,7 @@ public class FilmySyncAdapter extends AbstractThreadedSyncAdapter {
     TmdbVolleySingleton tmdbVolleySingleton = TmdbVolleySingleton.getInstance();
     RequestQueue tmdbrequestQueue = tmdbVolleySingleton.getRequestQueue();
 
-    private String api_key = BuildConfig.API_KEY;
+    private String api_key = BuildConfig.TMDB_API_KEY;
 
     public FilmySyncAdapter(Context context, boolean autoInitialize) {
 
@@ -187,7 +187,7 @@ public class FilmySyncAdapter extends AbstractThreadedSyncAdapter {
 
         final String Intheatres_Base_URL = resource.getString(R.string.tmdb_movie_base_url) + "now_playing?" + api_key;
 
-        JsonObjectRequest IntheatresJsonObjectRequest = new JsonObjectRequest(Request.Method.GET, Intheatres_Base_URL, null,
+        JsonObjectRequest IntheatresJsonObjectRequest = new JsonObjectRequest(Intheatres_Base_URL, null,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
@@ -214,7 +214,7 @@ public class FilmySyncAdapter extends AbstractThreadedSyncAdapter {
 
         final String Upcoming_Base_URL = resource.getString(R.string.tmdb_movie_base_url) + "upcoming?" + api_key;
 
-        JsonObjectRequest UpcomingJsonObjectRequest = new JsonObjectRequest(Request.Method.GET, Upcoming_Base_URL, null,
+        JsonObjectRequest UpcomingJsonObjectRequest = new JsonObjectRequest(Upcoming_Base_URL, null,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
@@ -240,7 +240,7 @@ public class FilmySyncAdapter extends AbstractThreadedSyncAdapter {
 
         final String BASE_URL = "https://api.themoviedb.org/3/movie/popular?api_key=b640f55eb6ecc47b3433cfe98d0675b1";
 
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, BASE_URL, null,
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(BASE_URL, null,
                 new Response.Listener<JSONObject>() {
                     @Override
 
@@ -263,12 +263,12 @@ public class FilmySyncAdapter extends AbstractThreadedSyncAdapter {
 
     private void intheatresparseOutput(String s, int type) {
         MainActivityParseWork pa = new MainActivityParseWork(getContext(), s);
-        pa.intheatres();
+        pa.inTheatres();
     }
 
     private void upcomingparseOutput(String result_upcoming) {
         MainActivityParseWork pa = new MainActivityParseWork(getContext(), result_upcoming);
-        pa.parseupcoming();
+        pa.parseUpcoming();
     }
 
     private void parseOutput(String result) {
